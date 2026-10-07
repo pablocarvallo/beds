@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cambio de sábanas</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sábanas">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#edf0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11161c" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;src:url(fonts/bricolage-grotesque.woff2) format("woff2")}
+@font-face{font-family:"Figtree";font-style:normal;font-weight:300 900;font-display:swap;src:url(fonts/figtree.woff2) format("woff2")}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<style>
+/* Concepto: lista vertical de miércoles pensada para el pulgar. Cada fila es un turno
+   (día, persona, check grande). Azul para Piti, rosa para Emi, verde para "hecho". */
+:root {
+  --bg: #edf0f3;
+  --surface: #ffffff;
+  --ink: #1a2330;
+  --muted: #5a6573;
+  --line: #d9dfe6;
+  --piti: #25688f;
+  --piti-bg: #e1eef6;
+  --emi: #a3426a;
+  --emi-bg: #f6e5ed;
+  --done: #2f7d5b;
+  --done-bg: #e3f2e9;
+  --on-done: #ffffff;
+  --warn: #9a5b0b;
+  --font-display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c;
+    --surface: #1a222b;
+    --ink: #e8edf2;
+    --muted: #9aa6b3;
+    --line: #2b3541;
+    --piti: #7bbbe0;
+    --piti-bg: #1b2f3d;
+    --emi: #eb97b9;
+    --emi-bg: #3a2230;
+    --done: #5cc08f;
+    --done-bg: #1b3327;
+    --on-done: #0d1f16;
+    --warn: #e0a85a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c;
+  --surface: #1a222b;
+  --ink: #e8edf2;
+  --muted: #9aa6b3;
+  --line: #2b3541;
+  --piti: #7bbbe0;
+  --piti-bg: #1b2f3d;
+  --emi: #eb97b9;
+  --emi-bg: #3a2230;
+  --done: #5cc08f;
+  --done-bg: #1b3327;
+  --on-done: #0d1f16;
+  --warn: #e0a85a;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  padding-inline: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+.app { max-width: 480px; margin: 0 auto; padding-block: 20px 36px; display: flex; flex-direction: column; gap: 16px; }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+/* Encabezado de mes */
+.month-bar { display: flex; align-items: center; gap: 8px; }
+.month-bar h1 {
+  flex: 1; min-width: 0; margin: 0; text-align: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: -0.01em; text-wrap: balance;
+}
+.month-bar h1 small { display: block; font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--muted); letter-spacing: 0.04em; margin-top: 2px; }
+.nav-btn {
+  width: 48px; height: 48px; flex: none; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center;
+}
+.nav-btn:active { background: var(--line); }
+
+/* Próximo cambio */
+.next {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.next-text { flex: 1; min-width: 0; }
+.eyebrow { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.eyebrow.late { color: var(--warn); }
+.next-date { font-family: var(--font-display); font-weight: 600; font-size: 20px; margin-top: 2px; text-wrap: balance; }
+.next .person { margin-top: 8px; }
+.mark-btn {
+  flex: none; min-height: 48px; padding: 0 16px; border-radius: 14px; font-weight: 600;
+  background: var(--ink); color: var(--bg); border: 0;
+}
+.mark-btn:active { opacity: 0.85; }
+
+/* Persona */
+.person {
+  display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 8px; border-radius: 999px;
+  font-weight: 600; font-size: 15px;
+}
+.person::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+.person.piti { color: var(--piti); background: var(--piti-bg); }
+.person.emi { color: var(--emi); background: var(--emi-bg); }
+
+/* Lista de miércoles */
+.summary { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; color: var(--muted); padding-inline: 4px; }
+.summary strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.row {
+  display: grid; grid-template-columns: 60px minmax(0, 1fr) 52px; align-items: center; gap: 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px 12px 14px;
+}
+.row.is-today { border-color: var(--ink); border-width: 2px; padding: 11px 13px; }
+.row.is-done { background: var(--done-bg); border-color: transparent; }
+.date { text-align: center; line-height: 1; }
+.date b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 34px; font-variant-numeric: tabular-nums; }
+.date span { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.who { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.status { font-size: 14px; color: var(--muted); }
+.status.late { color: var(--warn); font-weight: 600; }
+.status.today { color: var(--ink); font-weight: 600; }
+.is-done .status { color: var(--done); font-weight: 600; }
+.check {
+  width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+  background: transparent; border: 2.5px solid var(--muted); color: transparent;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.check[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--on-done); }
+.check:disabled { opacity: 0.6; }
+
+/* Pie */
+.foot { font-size: 13px; color: var(--muted); padding-inline: 4px; display: flex; flex-direction: column; gap: 6px; }
+.foot .totals { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.foot .totals span { font-variant-numeric: tabular-nums; }
+.today-link { align-self: center; background: none; border: 0; color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 12px; }
+.toast {
+  position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 448px; margin: 0 auto;
+  background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 14px; font-size: 15px; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) { .check { transition: none; } }
+</style>
+</head>
+<body>
+
+<main class="app" id="app" aria-live="polite"></main>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function () {
+  // Primer turno: miércoles 7 de octubre de 2026, le toca a Piti. Desde ahí se alterna cada semana.
+  var ANCHOR = Date.UTC(2026, 9, 7);
+  var PEOPLE = ['Piti', 'Emi'];
+  var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var CHECK_SVG = '<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CHEV_L = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CHEV_R = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var app = document.getElementById('app');
+  var toastEl = document.getElementById('toast');
+  var done = new Set();
+  var busy = new Set();
+  var LS_KEY = 'cambio-sabanas-hechos';
+  var now = new Date();
+  var view = { y: now.getFullYear(), m: now.getMonth() };
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function keyOf(y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); }
+  function parseKey(k) { var p = k.split('-'); return { y: +p[0], m: +p[1] - 1, d: +p[2] }; }
+  function turno(y, m, d) {
+    var n = Math.round((Date.UTC(y, m, d) - ANCHOR) / 604800000);
+    return ((n % 2) + 2) % 2;
+  }
+  function miercoles(y, m) {
+    var out = [], dim = new Date(y, m + 1, 0).getDate();
+    for (var d = 1; d <= dim; d++) if (new Date(y, m, d).getDay() === 3) out.push(d);
+    return out;
+  }
+  function label(y, m, d) { return 'miércoles ' + d + ' de ' + MESES[m].toLowerCase(); }
+  function todayKey() { var t = new Date(); return keyOf(t.getFullYear(), t.getMonth(), t.getDate()); }
+  function personHtml(i) { return '<span class="person ' + (i === 0 ? 'piti' : 'emi') + '">' + PEOPLE[i] + '</span>'; }
+
+  function loadLocal() {
+    try { var raw = localStorage.getItem(LS_KEY); if (raw) JSON.parse(raw).forEach(function (k) { done.add(k); }); } catch (e) {}
+  }
+  function saveLocal() {
+    localStorage.setItem(LS_KEY, JSON.stringify(Array.from(done)));
+  }
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.hidden = false;
+    clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.hidden = true; }, 3500);
+  }
+
+  // Primer miércoles sin check, desde el inicio del registro
+  function firstPending() {
+    var t = new Date(2026, 9, 7);
+    for (var i = 0; i < 260; i++) {
+      var k = keyOf(t.getFullYear(), t.getMonth(), t.getDate());
+      if (!done.has(k)) return { y: t.getFullYear(), m: t.getMonth(), d: t.getDate(), k: k };
+      t.setDate(t.getDate() + 7);
+    }
+    return null;
+  }
+
+  function render() {
+    var tk = todayKey();
+    var days = miercoles(view.y, view.m);
+    var nextP = firstPending();
+    var html = '';
+
+    html += '<div class="month-bar">' +
+      '<button class="nav-btn" data-nav="-1" aria-label="Mes anterior">' + CHEV_L + '</button>' +
+      '<h1>' + MESES[view.m] + ' ' + view.y + '<small>' + days.length + ' miércoles</small></h1>' +
+      '<button class="nav-btn" data-nav="1" aria-label="Mes siguiente">' + CHEV_R + '</button></div>';
+
+    if (nextP) {
+      var late = nextP.k < tk, isToday = nextP.k === tk;
+      var cap = late ? 'Atrasado' : (isToday ? 'Hoy' : 'Próximo cambio');
+      html += '<section class="next" aria-label="Próximo cambio">' +
+        '<div class="next-text"><div class="eyebrow' + (late ? ' late' : '') + '">' + cap + '</div>' +
+        '<div class="next-date">' + label(nextP.y, nextP.m, nextP.d) + '</div>' +
+        '<div class="person-wrap">' + personHtml(turno(nextP.y, nextP.m, nextP.d)) + '</div></div>' +
+        ((late || isToday) ? '<button class="mark-btn" data-key="' + nextP.k + '">Marcar hecho</button>' : '') +
+        '</section>';
+    }
+
+    var hechos = days.filter(function (d) { return done.has(keyOf(view.y, view.m, d)); }).length;
+    html += '<div class="summary"><span>Cambios del mes</span><strong>' + hechos + ' de ' + days.length + ' hechos</strong></div>';
+
+    html += '<ul class="list">';
+    days.forEach(function (d) {
+      var k = keyOf(view.y, view.m, d);
+      var p = turno(view.y, view.m, d);
+      var isDone = done.has(k);
+      var before = Date.UTC(view.y, view.m, d) < ANCHOR;
+      var status, cls = '';
+      if (isDone) status = 'Hecho';
+      else if (before) status = 'Anterior al registro';
+      else if (k === tk) { status = 'Hoy'; cls = ' today'; }
+      else if (k < tk) { status = 'Atrasado'; cls = ' late'; }
+      else if (nextP && k === nextP.k) status = 'Próximo';
+      else status = 'Programado';
+      html += '<li class="row' + (isDone ? ' is-done' : '') + (k === tk ? ' is-today' : '') + '">' +
+        '<div class="date"><b>' + d + '</b><span>mié</span></div>' +
+        '<div class="who">' + personHtml(p) + '<span class="status' + cls + '">' + status + '</span></div>' +
+        '<button class="check" data-key="' + k + '" aria-pressed="' + isDone + '"' + (busy.has(k) ? ' disabled' : '') +
+        ' aria-label="Cambio de sábanas, ' + label(view.y, view.m, d) + ', ' + PEOPLE[p] + '">' + CHECK_SVG + '</button>' +
+        '</li>';
+    });
+    html += '</ul>';
+
+    var cnt = [0, 0];
+    done.forEach(function (k) { var o = parseKey(k); cnt[turno(o.y, o.m, o.d)]++; });
+    html += '<div class="foot"><div class="totals"><span>Registrados en total:</span><span>' + PEOPLE[0] + ' ' + cnt[0] + '</span><span>' + PEOPLE[1] + ' ' + cnt[1] + '</span></div>' +
+      '<div>Empieza Piti el miércoles 7 de octubre de 2026 y se alterna cada semana.</div>' +
+      '<div>Los cambios marcados se guardan solo en este dispositivo.</div></div>';
+
+    if (view.y !== now.getFullYear() || view.m !== now.getMonth()) {
+      html += '<button class="today-link" data-nav="today">Volver a este mes</button>';
+    }
+    app.innerHTML = html;
+  }
+
+  async function toggle(k) {
+    if (busy.has(k)) return;
+    busy.add(k);
+    var was = done.has(k);
+    if (was) done.delete(k); else done.add(k);
+    render();
+    try {
+      saveLocal();
+    } catch (e) {
+      if (was) done.add(k); else done.delete(k);
+      toast('No se pudo guardar el cambio. Intenta de nuevo.');
+    } finally {
+      busy.delete(k);
+      render();
+    }
+  }
+
+  app.addEventListener('click', function (ev) {
+    var nav = ev.target.closest('[data-nav]');
+    if (nav) {
+      var v = nav.getAttribute('data-nav');
+      if (v === 'today') { var t = new Date(); view = { y: t.getFullYear(), m: t.getMonth() }; }
+      else {
+        var m = view.m + parseInt(v, 10), y = view.y;
+        if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+        view = { y: y, m: m };
+      }
+      render();
+      return;
+    }
+    var btn = ev.target.closest('[data-key]');
+    if (btn) toggle(btn.getAttribute('data-key'));
+  });
+
+  loadLocal();
+  render();
+
+  // Al volver a la app (por ejemplo, la semana siguiente) se actualiza la fecha de hoy.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    var enMesActual = view.y === now.getFullYear() && view.m === now.getMonth();
+    now = new Date();
+    if (enMesActual) view = { y: now.getFullYear(), m: now.getMonth() };
+    render();
+  });
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (e) {}
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+
+</body>
+</html>
