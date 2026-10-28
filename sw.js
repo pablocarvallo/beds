@@ -1,6 +1,6 @@
 /* Permite abrir la app sin conexión.
    Estrategia: primero la red (para recibir siempre la versión más nueva) y, si no responde, la copia guardada. */
-const CACHE = 'sabanas-v1-ds1';
+const CACHE = 'sabanas-v2-panel';
 const ARCHIVOS = [
   './',
   'index.html',
